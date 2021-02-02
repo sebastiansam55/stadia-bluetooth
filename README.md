@@ -1,6 +1,6 @@
 # "bluetooth" Stadia controller
 There are a lot of caveats to go over here. Please read the entire readme before starting to use this.
-!["wireless bluetooth"]()
+!["wireless bluetooth"](final.jpeg)
 
 ## Requirements
 This program only currently works only RPi0 to other Linux based machines, but if any
