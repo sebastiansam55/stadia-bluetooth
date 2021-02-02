@@ -1,0 +1,11 @@
+[Unit]
+Desription=Stadia controller BT, respawn, after bluetooth
+After=bluetooth.target
+Require=bluetooth.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/bluetooth/btclient.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
