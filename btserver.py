@@ -1,9 +1,12 @@
+#!/usr/bin/python3
+
 import bluetooth
 from bluetooth import BluetoothError
 import json
 import time
 import argparse
 import evdev
+import re
 from evdev import AbsInfo, ecodes as e
 
 parser = argparse.ArgumentParser(description="UInput forwarding over bluetooth")
@@ -11,7 +14,6 @@ parser.add_argument('-u', '--uuid', dest="uuid", default="1111", action="store",
 parser.add_argument('-d', '--dev_name', dest="dev_name", default="Google Inc. Stadia Controller", action="store", help="Name of device to be created for remote interactions")
 parser.add_argument('--debug', dest="debug", default=False, action="store_true", help="Enable client debug (will not write events)")
 parser.add_argument('--cap', dest="cap", default="mouse keyboard", action="store", help="Description of device to be created for input. [keyboard, mouse, trackpad, stadia]")
-parser.add_argument('--all', dest="exec_all", default=False, action="store_true", help="Execute all recieved commands")
 
 args = parser.parse_args()
 
@@ -98,19 +100,29 @@ ui = evdev.UInput(get_cap(args.cap), name=args.dev_name, vendor=0x18d1, product=
 
 while True:
     try:
-        msg = cs.recv(1024).decode("utf-8")
-        if not msg:
+        in_msg = cs.recv(1024).decode("utf-8")
+        if not in_msg:
             break
-        try:
-            data = json.loads(msg.replace("'", "\""))
-        except:
-            print("JSON ERROR")
-            continue
-        # print(time.time()-float(data['timestamp']))
-        if not args.debug:
-            ui.write(data["type"], data["code"], data["value"])
-        else:
-            if not args.quiet: print("Write event:", data["type"], data["code"], data["value"])
+        for msg in re.findall(r'(\{.*?\})', in_msg):
+            # print(msg)
+            try:
+                data = json.loads(msg.replace("'", "\""))
+                data["type"]
+                data["code"]
+                data["value"]
+            except Exception as inst:
+                print(inst)
+                print(msg)
+                print("JSON ERROR")
+                continue
+            # print(time.time()-float(data['timestamp']))
+            if not args.debug:
+                ui.write(data["type"], data["code"], data["value"])
+            else:
+                print("Write event:", data["type"], data["code"], data["value"])
+        ui.syn()
+
+
     except BluetoothError:
         print("Bluetooth error, relaunching server")
         cs.close()
@@ -119,9 +131,6 @@ while True:
         cs = None
         while cs == None:
             cs = advert(ss)
-
-
-
 
 print("Disconnected.")
 

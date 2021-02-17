@@ -1,0 +1,6 @@
+#!/bin/sh
+while true
+do
+evtest /dev/input/event0
+done
+

@@ -1,0 +1,2 @@
+#!/bin/sh
+/home/pi/run | /home/pi/btstdinclient.py
