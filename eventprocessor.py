@@ -6,7 +6,7 @@ file = sys.argv[1]
 pat = r'time (.*?), type \d \((.*?)\), code \((.*?)\)'
 time_pat = r'time (.*?),'
 event_pat = r'type \d \((.*?)\)'
-code_pat = r'code \d \((.*?)\)'
+code_pat = r'code \d{1,} \((.*?)\)'
 
 with open(file, 'r') as fin:
     with open(file+".csv", 'w+') as out:
